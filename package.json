@@ -1,0 +1,22 @@
+{
+  "name": "three_sandbox",
+  "version": "1.0.0",
+  "description": "testing three.js",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "three"
+  ],
+  "author": "vincent portelli",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1",
+    "fs": "0.0.1-security",
+    "http": "0.0.0",
+    "pngjs": "^3.4.0",
+    "three-trackballcontrols": "0.0.8",
+    "three.js": "^0.77.1"
+  }
+}
