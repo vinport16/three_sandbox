@@ -6,6 +6,15 @@ var camera_azimuth = 95;
 var camera_elevation = 2;
 var camera_radius = 10;
 
+var xAxis = new THREE.Vector3(1,0,0);
+var yAxis = new THREE.Vector3(0,1,0);
+var zAxis = new THREE.Vector3(0,0,1);
+
+var tankSpeed = 0.6;
+var tankRotationSpeed = 0.1;
+var tank;
+
+
 
 function setCameraPosition(target, azimuth, elevation, radius){
   
@@ -65,6 +74,35 @@ let upListener = (e) => {
 }
 renderer.domElement.addEventListener('mouseup', upListener)
 
+//tank movement
+
+function onBoard(tank){
+    return tank.position.x > 0.1 && tank.position.x < map.length - 0.1 && tank.position.z > 0.1 && tank.position.z < map[0].length -0.1;
+}
+document.addEventListener("keydown", onDocumentKeyDown, false);
+function onDocumentKeyDown(event) {
+    var keyCode = event.which;
+    if (keyCode == 87) { //w - forward
+        tank.translateZ(tankSpeed);
+        if(!onBoard(tank)){
+            tank.translateZ(-tankSpeed);
+        }
+    } else if (keyCode == 83) {//s - backward
+        tank.translateZ(-tankSpeed);
+        if(!onBoard(tank)){
+            tank.translateZ(tankSpeed);
+        }
+    } else if (keyCode == 65) {//a - turn left
+        tank.rotateY(tankRotationSpeed);
+        console.log(tank.rotation);
+    } else if (keyCode == 68) {//d - turn right
+        tank.rotateY(-tankRotationSpeed);
+    }
+
+    //Fix this to be smooth and roate the tank on the x and z
+    tank.position.y = map[Math.floor(tank.position.x)][Math.floor(tank.position.z)]/30 + 1;
+};
+
 
 var light = new THREE.DirectionalLight( 0xffffff, 0.5 );
 light.position = new THREE.Vector3(10,1,5);
@@ -100,6 +138,13 @@ for(var i in spheres){
   sph.position.z = spheres[i].p.z;
   scene.add( sph );
 }
+
+//Add a block to move around
+let geometry = new THREE.BoxGeometry(5,2,10);
+let material = new THREE.MeshBasicMaterial({color: 0x00ff00, wireframe: false});
+tank = new THREE.Mesh(geometry, material);
+scene.add(tank);
+tank.position.set(5, 1, 15);
 
 
 // -------
