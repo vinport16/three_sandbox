@@ -1,10 +1,18 @@
 var scene = new THREE.Scene();
 var camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.1, 1000 );
 
-var camera_target = new THREE.Vector3(0,0,0);
+var worldOrigin = new THREE.Vector3(0,0,0);
+var camera_target = worldOrigin;
 var camera_azimuth = 95;
 var camera_elevation = 2;
 var camera_radius = 10;
+var camera_world_azimuth = 95;
+var camera_world_elevation = 2;
+var camera_world_radius = 10;
+var camera_tank_azimuth = 180;
+var camera_tank_elevation = 3.14/2;
+var camera_tank_radius = 8;
+var cameraMode = 0; //camera mode 0 = look at origin, camera mode 1 = look at tank.
 
 var xAxis = new THREE.Vector3(1,0,0);
 var yAxis = new THREE.Vector3(0,1,0);
@@ -38,6 +46,12 @@ renderer.domElement.addEventListener("wheel", function(wheelEvent){
     camera_radius = 1;
   }
 
+  if(cameraMode == 0){
+      camera_world_radius = camera_radius;
+  }else if(cameraMode == 1){
+      camera_tank_radius = camera_radius;
+  }
+
   setCameraPosition(camera_target, camera_azimuth, camera_elevation, camera_radius);
   return false;
 });
@@ -61,6 +75,14 @@ let moveListener = (e) => {
       }else if(camera_elevation < 0.001){
         camera_elevation = 0.001;
       }
+      if(cameraMode == 0){
+        camera_world_azimuth = camera_azimuth;
+        camera_world_elevation = camera_elevation;
+    }else if(cameraMode = 1){
+        camera_tank_azimuth = camera_azimuth;
+        camera_tank_elevation = camera_elevation;
+    }
+
       setCameraPosition(camera_target, camera_azimuth, camera_elevation, camera_radius);
     }
 }
@@ -97,10 +119,37 @@ function onDocumentKeyDown(event) {
         console.log(tank.rotation);
     } else if (keyCode == 68) {//d - turn right
         tank.rotateY(-tankRotationSpeed);
+    } else if (keyCode == 67){//c - change camera mode
+        cameraMode = (cameraMode == 0) ? (1) : (0);
     }
+
+    if(cameraMode == 0){
+        camera_target = worldOrigin;
+        camera_azimuth = camera_world_azimuth;
+        camera_elevation = camera_world_elevation;
+        camera_radius = camera_world_radius;
+    }else if(cameraMode = 1){
+        camera_target = tank.position;
+        camera_azimuth = camera_tank_azimuth;
+        camera_elevation = camera_tank_elevation;
+        camera_radius = camera_tank_radius;
+    }
+    setCameraPosition(camera_target, camera_azimuth, camera_elevation, camera_radius);
+
 
     //Fix this to be smooth and roate the tank on the x and z
     tank.position.y = map[Math.floor(tank.position.x)][Math.floor(tank.position.z)]/30 + 1;
+    var x = Math.floor(tank.position.x);
+    var z = Math.floor(tank.position.z);
+    var w = map[x].length;
+
+    //let currentFace = new THREE.Face3(x*w+z, x*w+z+1, (x+1)*w+z+1);
+
+    let currentFace = terrain.faces[x*w+z];
+    console.log(currentFace);
+    //tank.rotateX()
+    
+
 };
 
 
