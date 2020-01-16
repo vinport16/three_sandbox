@@ -138,19 +138,42 @@ function onDocumentKeyDown(event) {
 
 
     //Fix this to be smooth and roate the tank on the x and z
-    tank.position.y = map[Math.floor(tank.position.x)][Math.floor(tank.position.z)]/30 + 1;
-    var x = Math.floor(tank.position.x);
-    var z = Math.floor(tank.position.z);
-    var w = map[x].length;
+     tank.position.y = map[Math.floor(tank.position.x)][Math.floor(tank.position.z)]/30 + tank.position.y / 2;
+     var x = Math.floor(tank.position.x);
+     var z = Math.floor(tank.position.z);
+     var w = map[x].length;
 
     //let currentFace = new THREE.Face3(x*w+z, x*w+z+1, (x+1)*w+z+1);
 
     let currentFace = terrain.faces[x*w+z];
-    console.log(currentFace);
+    //console.log(currentFace);
     //tank.rotateX()
+
+    var firstTile = onFirstTile(tank);
+    // console.log("tank is at: ");
+    // console.log(tank.position);
+    // console.log("on first tile? " + firstTile);
+
+    console.log("current face: ");
+    // console.log(currentFace.a);
+    // console.log(currentFace.b);
+    // console.log(currentFace.c);
+
+    //get height of each vertex:
+    var heights = [terrain.vertices[x*w+y].y, terrain.vertices[x*w+y+1].y, terrain.vertices[(x+1)*w+y+1].y]
+    //console.log("current heights:");
+    //console.log(heights);
+
     
 
 };
+
+function onFirstTile(tank){
+    var x = tank.position.x % 1;
+    var z = tank.position.z % 1;
+
+    return x + z > 1;
+}
 
 
 var light = new THREE.DirectionalLight( 0xffffff, 0.5 );
@@ -189,7 +212,7 @@ for(var i in spheres){
 }
 
 //Add a block to move around
-let geometry = new THREE.BoxGeometry(5,2,10);
+let geometry = new THREE.BoxGeometry(0.1,1,0.2);
 let material = new THREE.MeshBasicMaterial({color: 0x00ff00, wireframe: false});
 tank = new THREE.Mesh(geometry, material);
 scene.add(tank);
@@ -234,8 +257,10 @@ for(var x = 0; x < map.length-1; x++){
 terrain.computeFaceNormals();
 terrain.computeVertexNormals();
 
-let mat = new THREE.MeshPhongMaterial({ vertexColors: THREE.VertexColors });
+let mat = new THREE.MeshPhongMaterial({ vertexColors: THREE.VertexColors, wireframe:true });
 var m = new THREE.Mesh(terrain, mat);
+//var m = new THREE.MeshBasicMaterial({color: 0x00ff00, wireframe: true});
+
 m.material.side = THREE.DoubleSide;
 scene.add(m);
 
