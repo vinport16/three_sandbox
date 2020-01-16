@@ -138,33 +138,31 @@ function onDocumentKeyDown(event) {
 
 
     //Fix this to be smooth and roate the tank on the x and z
-     tank.position.y = map[Math.floor(tank.position.x)][Math.floor(tank.position.z)]/30 + tank.position.y / 2;
      var x = Math.floor(tank.position.x);
      var z = Math.floor(tank.position.z);
      var w = map[x].length;
 
-    //let currentFace = new THREE.Face3(x*w+z, x*w+z+1, (x+1)*w+z+1);
+     tank.position.y = map[x][z]/30 + tank.geometry.parameters.height / 2;
 
-    let currentFace = terrain.faces[x*w+z];
-    //console.log(currentFace);
-    //tank.rotateX()
 
-    var firstTile = onFirstTile(tank);
-    // console.log("tank is at: ");
-    // console.log(tank.position);
-    // console.log("on first tile? " + firstTile);
-
-    console.log("current face: ");
-    // console.log(currentFace.a);
-    // console.log(currentFace.b);
-    // console.log(currentFace.c);
-
-    //get height of each vertex:
-    var heights = [terrain.vertices[x*w+y].y, terrain.vertices[x*w+y+1].y, terrain.vertices[(x+1)*w+y+1].y]
-    //console.log("current heights:");
-    //console.log(heights);
 
     
+    //tank.rotateX()
+
+   var firstTile = onFirstTile(tank);
+
+   var vertex1 = terrain.vertices[x*w+z];
+   var vertex2 = (firstTile) ? (terrain.vertices[x*w+z+1]) : (terrain.vertices[(x+1)*w+z]);
+   var vertex3 = terrain.vertices[(x+1)*w+z+1];
+
+   var line1 = {x: vertex1.x - vertex2.x, y: vertex1.y - vertex2.y, z: vertex1.z - vertex2.z};
+   var line2 = {x: vertex1.x - vertex3.x, y: vertex1.y - vertex3.y, z: vertex1.z - vertex3.z};
+
+   var normal = crossProduct(line2, line1);
+   console.log("normal: ");
+   console.log(normal);
+   
+  // var heights = [terrain.vertices[x*w+z].y, terrain.vertices[x*w+z+1].y, terrain.vertices[(x+1)*w+z+1].y]
 
 };
 
@@ -289,6 +287,14 @@ animate();
 
 function dotProduct(v1, v2) {
     return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
+}
+
+function crossProduct(a, b){
+    var c = {x: 0, y: 0, z: 0};
+    c.x = a.y * b.z - a.z * b.y;
+    c.y = a.z * b.x - a.x * b.z;
+    c.z = a.x * b.y - a.y * b.x;
+    return c;
 }
 
 function squaredLength(v) {
