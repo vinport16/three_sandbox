@@ -19,7 +19,7 @@ var yAxis = new THREE.Vector3(0,1,0);
 var zAxis = new THREE.Vector3(0,0,1);
 
 var tankSpeed = 0.6;
-var tankRotationSpeed = 0.1;
+var tankRotationSpeed = Math.PI/8;
 var tank;
 
 
@@ -116,7 +116,7 @@ function onDocumentKeyDown(event) {
         }
     } else if (keyCode == 65) {//a - turn left
         tank.rotateY(tankRotationSpeed);
-        console.log(tank.rotation);
+        //console.log(tank.rotation);
     } else if (keyCode == 68) {//d - turn right
         tank.rotateY(-tankRotationSpeed);
     } else if (keyCode == 67){//c - change camera mode
@@ -149,21 +149,58 @@ function onDocumentKeyDown(event) {
     
     //tank.rotateX()
 
-   var firstTile = onFirstTile(tank);
+    //get the normal for the current face. 
+    var firstTile = onFirstTile(tank);
 
-   var vertex1 = terrain.vertices[x*w+z];
-   var vertex2 = (firstTile) ? (terrain.vertices[x*w+z+1]) : (terrain.vertices[(x+1)*w+z]);
-   var vertex3 = terrain.vertices[(x+1)*w+z+1];
+    var vertex1 = terrain.vertices[x*w+z];
+    var vertex2 = (firstTile) ? (terrain.vertices[x*w+z+1]) : (terrain.vertices[(x+1)*w+z+1]);
+    var vertex3 = (firstTile) ? (terrain.vertices[(x+1)*w+z+1]) : (terrain.vertices[(x+1)*w+z]);
 
-   var line1 = {x: vertex1.x - vertex2.x, y: vertex1.y - vertex2.y, z: vertex1.z - vertex2.z};
-   var line2 = {x: vertex1.x - vertex3.x, y: vertex1.y - vertex3.y, z: vertex1.z - vertex3.z};
 
-   var normal = crossProduct(line2, line1);
-   console.log("normal: ");
-   console.log(normal);
-   
-  // var heights = [terrain.vertices[x*w+z].y, terrain.vertices[x*w+z+1].y, terrain.vertices[(x+1)*w+z+1].y]
+    var line1 = {x: vertex1.x - vertex2.x, y: vertex1.y - vertex2.y, z: vertex1.z - vertex2.z};
+    var line2 = {x: vertex1.x - vertex3.x, y: vertex1.y - vertex3.y, z: vertex1.z - vertex3.z};
 
+    var normal = crossProduct(line1, line2);
+//    console.log("normal: ");
+//    console.log(normal);
+    
+    //console.log("direction: ");
+    //console.log(tank.rotation);
+    var yRot = tank.rotation.y;
+    // var heights = [terrain.vertices[x*w+z].y, terrain.vertices[x*w+z+1].y, terrain.vertices[(x+1)*w+z+1].y]
+
+    //now use the rotation of the tank to determine its direction so we know where it's coordinate system is. 
+    //Remember, the tank is always facing it's local positive z.
+
+    var tankDirection = tank.rotation.y;
+   //tank.rotateX(normal.x);
+   // tank.rotateZ(normal.z);
+
+    //var vec = normal;
+
+    //var up = new THREE.Vector3(0,1,0);
+    
+    //var axis = crossProduct( up, vec );
+
+    // if ( vec.y == 1 || vec.y == -1 ) {
+    //     axis = new THREE.Vector3( 1, 0, 0 );
+    // }
+
+    //var radians = Math.acos( dotProduct(vec, up) );
+    //var mat = new THREE.Matrix4().makeRotationAxis( axis, radians );
+    //console.log(mat)
+
+    // apply the rotation to the cone
+    //tank.rotation.getRotationFromMatrix( mat, tank.scale );
+    //tank.applyMatrix( mat );
+    //tank.applyMatrix(new THREE.Matrix4().setRotationFromEuler( normal ));
+    //tank.rotation.y = yRot;
+
+    //SIMPLE CASE: tilt only one direction
+    console.log("facing: " + tank.rotation.y);
+    console.log("face normal: ");
+    console.log(normal);
+    
 };
 
 function onFirstTile(tank){
@@ -210,7 +247,7 @@ for(var i in spheres){
 }
 
 //Add a block to move around
-let geometry = new THREE.BoxGeometry(0.1,1,0.2);
+let geometry = new THREE.BoxGeometry(1,1,2);
 let material = new THREE.MeshBasicMaterial({color: 0x00ff00, wireframe: false});
 tank = new THREE.Mesh(geometry, material);
 scene.add(tank);
