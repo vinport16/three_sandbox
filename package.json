@@ -16,7 +16,6 @@
     "fs": "0.0.1-security",
     "http": "0.0.0",
     "pngjs": "^3.4.0",
-    "three-trackballcontrols": "0.0.8",
     "three.js": "^0.77.1"
   }
 }
