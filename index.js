@@ -20,17 +20,25 @@ app.get('/hexagons.js', function(req, res){
   res.sendFile(__dirname + '/hexagons.js');
 });
 
-app.get('/script.js', function(req, res){
-  res.sendFile(__dirname + '/script.js');
+app.get('/black_star.png', function(req, res){
+  res.sendFile(__dirname + '/star.png');
 });
 
-app.get('/script2.js', function(req, res){
-  res.sendFile(__dirname + '/script2.js');
+app.get('/script_planets.js', function(req, res){
+  res.sendFile(__dirname + '/script_planets.js');
+});
+
+app.get('/script_terrain.js', function(req, res){
+  res.sendFile(__dirname + '/script_terrain.js');
+});
+
+app.get('/script_models.js', function(req, res){
+  res.sendFile(__dirname + '/script_models.js');
 });
 
 var map = [];
 
-fs.createReadStream("terrain.png").pipe(new PNG()).on('parsed',function(){
+fs.createReadStream("dog_eyes.png").pipe(new PNG()).on('parsed',function(){
   for(var y = 0; y < this.height; y++){
     map.push([]);
     for(var x = 0; x < this.width; x++){
