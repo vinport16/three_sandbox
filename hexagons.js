@@ -12,7 +12,7 @@ var nx = height[0].length;
 var colors = [0xf00ff0, 0xffff00, 0x0f00ff, 0xff0fff];
 var currentColor = 0;
 
-/**
+
 for(y in height){
   for(x in height[y]){
     let p = new THREE.Vector3(x-nx/2, height[y][x]/2, y-ny/2);
@@ -30,7 +30,7 @@ for(y in height){
     scene.add( hex );
   }
 }
-**/
+
 
 // ===== geometry ===== //
 

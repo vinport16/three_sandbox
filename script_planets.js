@@ -8,15 +8,18 @@ var camera_radius = 10;
 
 // lets have some spheres
 var spheres= [{p:new THREE.Vector3(0,13,0), r:1},
-              {p:new THREE.Vector3(6,9,0), r:2},
-              {p:new THREE.Vector3(-30,6,12), r:5},
-              {p:new THREE.Vector3(2,-7,21), r:6},
-              {p:new THREE.Vector3(-50,3,32), r:5},
-              {p:new THREE.Vector3(40,-11,-4), r:3.3},];
+              {p:new THREE.Vector3(6,9,0), r:1},
+              {p:new THREE.Vector3(-30,6,12), r:1},
+              {p:new THREE.Vector3(2,-7,21), r:1},
+              {p:new THREE.Vector3(-50,3,32), r:1},
+              {p:new THREE.Vector3(40,-11,-4), r:1},];
+
+// lets have some tubes
+var tubes= [{p1:new THREE.Vector3(0,13,0), p2:new THREE.Vector3(6,9,0), r:0.5},
+            {p1:new THREE.Vector3(-30,6,12), p2:new THREE.Vector3(2,-7,21), r:0.5},
+            {p1:new THREE.Vector3(-50,3,32), p2:new THREE.Vector3(2,-7,21), r:0.5}];
 
 var volume_sphere_radius = 0.7;
-var ships =  [{length:6, width:4, height:2, position:new THREE.Vector3(6,-8,8), rotation:{y:0, x:0}, radius:3.5}];
-
 
 // lets draw the spheres
 var colors = [0xf00ff0, 0xffff00, 0x0f00ff, 0xff0f4f];
@@ -33,35 +36,23 @@ for(var i in spheres){
   scene.add( sph );
 }
 
-for(var i in ships){
-  let geometry = new THREE.BoxGeometry(ships[i].width, ships[i].height, ships[i].length);
+//lets draw the tubes
+for(var i in tubes){
+  let geometry = new THREE.CylinderGeometry(tubes[i].r, tubes[i].r, tubes[i].p1.distanceTo(tubes[i].p2), 12);
   let material = new THREE.MeshLambertMaterial( { color: colors[currentColor] } );
   currentColor = (currentColor + 1)%4;
-  let ship_mesh = new THREE.Mesh(geometry, material);
-  scene.add(ship_mesh);
+  let tube = new THREE.Mesh( geometry, material );
+  
+  // orient in world
+  // find center position
+  middle = (new THREE.Vector3(0,0,0).add(tubes[i].p1).add(tubes[i].p2)).divideScalar(2)
+  tube.position.x = middle.x;
+  tube.position.y = middle.y;
+  tube.position.z = middle.z;
+  // rotate about center
+  tube.setRotationFromQuaternion(quart_between(tubes[i].p1, tubes[i].p2));
 
-  let points = point_cloud_for_ship(ships[i]);
-  for(var p in points){
-    let geometry = new THREE.SphereGeometry(volume_sphere_radius, 8, 6);
-    let material = new THREE.MeshLambertMaterial( { color: colors[currentColor] } );
-    currentColor = (currentColor + 1)%4;
-    let sph = new THREE.Mesh( geometry, material );
-    //sph.material.visible = false;
-    scene.add( sph );
-    THREE.SceneUtils.attach(sph, scene, ship_mesh);
-    sph.position.x = points[p].x;
-    sph.position.y = points[p].y;
-    sph.position.z = points[p].z;
-  }
-
-
-  ship_mesh.position.x = ships[i].position.x;
-  ship_mesh.position.y = ships[i].position.y;
-  ship_mesh.position.z = ships[i].position.z;
-
-  //make this ship invisible
-  //ship_mesh.material.visible = false;
-  ships[i].mesh = ship_mesh;
+  scene.add( tube );
 }
 
 function setCameraPosition(target, azimuth, elevation, radius){
@@ -147,28 +138,6 @@ let upListener = (e) => {
 }
 renderer.domElement.addEventListener('mouseup', upListener)
 
-function point_cloud_for_ship(ship){
-  let points = [];
-
-  let resolution = 1.0;
-
-  let dx = -ship.width/2 +resolution/2;
-  while(dx < ship.width/2){
-    let dy = -ship.height/2 +resolution/2;
-    while(dy < ship.height/2){
-      let dz = -ship.length/2 +resolution/2;
-      while(dz < ship.length/2){
-        points.push(new THREE.Vector3(dx, dy, dz));
-        dz += resolution;
-      }
-      dy += resolution;
-    }
-    dx += resolution;
-  }
-
-  return points;
-}
-
 
 var light = new THREE.DirectionalLight( 0xffffff, 0.5 );
 light.position = new THREE.Vector3(10,1,5);
@@ -181,10 +150,6 @@ scene.add( ambient );
 function animate() {
   requestAnimationFrame( animate );
   renderer.render( scene, camera );
-
-  ships[0].mesh.rotation.y += 0.01;
-  ships[0].mesh.rotation.x += 0.007;
-  
 }
 animate();
 
@@ -254,4 +219,21 @@ function intersectRayWithSphere(center, radius,
     intersection.z = origin.z + t * direction.z;
 
     return intersection;
+}
+
+function quart_between(p1, p2){
+  // Set starting and ending vectors
+  var myVector = new THREE.Vector3(0,1,0); // up
+  var targetVector = p2.clone();
+  targetVector.sub(p1);
+
+  // Normalize vectors to make sure they have a length of 1
+  myVector.normalize();
+  targetVector.normalize();
+
+  // Create a quaternion, and apply starting, then ending vectors
+  var quaternion = new THREE.Quaternion();
+  quaternion.setFromUnitVectors(myVector, targetVector);
+
+  return quaternion;
 }
